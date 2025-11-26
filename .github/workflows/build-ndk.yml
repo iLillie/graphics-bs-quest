@@ -58,7 +58,6 @@ jobs:
           lfs: true
           fetch-depth: 0
           fetch-tags: true
-          qpm_version: 'version@1.5.2' 
 
       - uses: seanmiddleditch/gha-setup-ninja@v3
 
@@ -114,6 +113,7 @@ jobs:
           restore: true
           resolve_ndk: true
           cache: true
+          qpm_version: 'version@1.5.2' 
 
       - name: Build & Create Qmod
         run: |
