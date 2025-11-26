@@ -58,6 +58,7 @@ jobs:
           lfs: true
           fetch-depth: 0
           fetch-tags: true
+          version: '1.5.2'
 
       - uses: seanmiddleditch/gha-setup-ninja@v3
 
