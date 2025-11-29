@@ -4,11 +4,11 @@
   "name": "${mod_name}",
   "id": "${mod_id}",
   "coverImage": "cover.png",
-  "author": "MyTemplateModAuthor",
+  "author": "Lillie",
   "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.40.8_7379",
-  "description": "MyTemplateModDescription",
+  "packageVersion": "1.41.0_11623",
+  "description": "Yes new template",
   "dependencies": [],
   "modFiles": [
     "${binary}"

@@ -4,12 +4,12 @@
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
-    "name": "MyTemplateModName",
-    "id": "MyTemplateModId",
+    "name": "Minimal Graphics Mod",
+    "id": "MinimalGraphicsMod",
     "version": "0.1.0",
     "url": null,
     "additionalData": {
-      "overrideSoName": "libMyTemplateModId.so",
+      "overrideSoName": "libMinimalGraphicsMod.so",
       "cmake": true
     }
   },
@@ -71,32 +71,19 @@
       "./extern/libs"
     ],
     "qmodIncludeFiles": [],
-    "qmodOutput": "./MyTemplateModName.qmod"
+    "qmodOutput": "./MinimalGraphicsMod.qmod"
   },
   "dependencies": [
     {
-      "id": "autohooks",
-      "versionRange": "^0.1.0",
-      "additionalData": {}
-    },
-    {
       "id": "beatsaber-hook",
-      "versionRange": "^6.4.2",
-      "additionalData": {}
-    },
-    {
-      "id": "bs-cordl",
-      "versionRange": "4008.*",
-      "additionalData": {}
-    },
-    {
-      "id": "mmkay",
-      "versionRange": "^0.2.1",
-      "additionalData": {}
+      "versionRange": "^7.0.0",
+      "additionalData": {
+        "includeQmod": false
+      }
     },
     {
       "id": "paper2_scotland2",
-      "versionRange": "^4.6.4",
+      "versionRange": "^4.4.0",
       "additionalData": {}
     },
     {
@@ -104,6 +91,20 @@
       "versionRange": "^0.1.6",
       "additionalData": {
         "includeQmod": false
+      }
+    },
+    {
+      "id": "capstone",
+      "versionRange": "^0.1.0",
+      "additionalData": {
+        "private": true
+      }
+    },
+    {
+      "id": "flamingo",
+      "versionRange": "^1.0.0",
+      "additionalData": {
+        "private": true
       }
     }
   ]
