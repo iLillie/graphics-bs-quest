@@ -10,106 +10,318 @@
 #include <cstddef>
 #include <cstdint>
 
+struct float3 {
+    float x;
+    float y;
+    float z;
+};
+
+struct RoomSettings {
+    float3 center;
+    float rotation;
+};
+
+struct SelectedProfile {
+    // bool
+    int builtIn;
+    int index;
+};
+
+struct ControllerSettings
+{
+     float3 position; //Field offset: 0x0
+     float3 rotation; //Field offset: 0xC
+     // bool
+     int hapticFeedback; //Field offset: 0x18
+     SelectedProfile selectedProfile; //Field offset: 0x1C
+};
+
+struct AudioSettings
+{
+  float volume; //Field offset: 0x0
+  float ambientVolumeScale; //Field offset: 0x4
+  float latency; //Field offset: 0x8
+  int overrideLatency; //Field offset: 0xC
+};
+
+struct MiscSettings
+{
+    enum ResponseLevel
+    {
+        Instant = 0,
+        Long = 1,
+    };
+
+    Il2CppString* language; //Field offset: 0x0
+    ResponseLevel pauseButtonResponse; //Field offset: 0x8
+};
+
+
+struct SmoothCameraSettings
+{
+ int enabled; //Field offset: 0x0
+ float fov; //Field offset: 0x4
+ float smoothPosition; //Field offset: 0x8
+ float smoothRotation; //Field offset: 0xC
+ int thirdPersonEnabled; //Field offset: 0x10
+ float3 thirdPersonPosition; //Field offset: 0x14
+ float3 thirdPersonRotation; //Field offset: 0x20
+};
+
+struct QualitySettings
+{
+     enum BloomQuality
+    {
+        Game = 0,
+        LightBaking = 1,
+    };
+
+    enum MainEffectOption
+    {
+        Off = 0,
+        Game_ = 1,
+        LightBaking_ = 2,
+    };
+    enum MirrorQuality
+    {
+        Off_ = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3,
+    };
+
+     enum ObstacleQuality
+    {
+        Low_ = 0,
+        Medium_ = 1,
+        High_ = 2,
+    };
+
+  float renderViewportScale; //Field offset: 0x0
+  float vrResolutionScale; //Field offset: 0x4
+  float menuVRResolutionScaleMultiplier; //Field offset: 0x8
+  int antiAliasingLevel; //Field offset: 0xC
+  int targetFramerate; //Field offset: 0x10
+  int vSyncCount; //Field offset: 0x14
+  int maxQueuedFrames; //Field offset: 0x18
+  MainEffectOption mainEffect; //Field offset: 0x1C
+  BloomQuality bloom; //Field offset: 0x20
+  MirrorQuality mirror; //Field offset: 0x24
+  ObstacleQuality obstacles; //Field offset: 0x28
+  bool screenDisplacementEffects; //Field offset: 0x2C
+  bool smokeGraphics; //Field offset: 0x2D
+  bool depthTexture; //Field offset: 0x2E
+  bool burnMarkTrails; //Field offset: 0x2F
+  int maxShockwaveParticles; //Field offset: 0x30
+  int maxNumberOfCutSoundEffects; //Field offset: 0x34
+};
+
+struct QuestSettings {
+    enum FoveatedRenderingLevel
+    {
+        Off = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3,
+        HighTop = 4,
+    };
+
+    enum SuggestedPerformanceLevel
+    {
+        Default = 0,
+        PowerSavings = 1,
+        SustainedLow = 2,
+        SustainedHigh = 3,
+        Boost = 4,
+    };
+
+    SuggestedPerformanceLevel cpuLevel; //Field offset: 0x0
+    SuggestedPerformanceLevel gpuLevel; //Field offset: 0x4
+    FoveatedRenderingLevel foveatedRenderingMenu; //Field offset: 0x8
+    FoveatedRenderingLevel foveatedRenderingGameplay; //Field offset: 0xC
+    bool eyeTrackedFoveatedRendering; //Field offset: 0x10
+    bool dynamicFoveatedRendering; //Field offset: 0x11
+};
+
+struct int2 {
+ int x; //Field offset: 0x0
+ int y; //Field offset: 0x4
+};
+
+struct WindowSettings {
+    bool fullscreen; //Field offset: 0x0
+    int2 resolution; //Field offset: 0x4
+};
+
+struct CustomServerSettings {
+    bool useCustomEnvironment;
+    bool forceGameLiftEnvironment; //Field offset: 0x1
+    StringW hostName;
+};
+
+struct PerformanceToolSettings {
+    bool recordFps; //Field offset: 0x0
+    bool showFps; //Field offset: 0x1
+    bool showMemory; //Field offset: 0x2
+    bool saveScreenshot; //Field offset: 0x3
+};
+
+struct DebugSettings {
+    bool showBeatmapLevelVersion; //Field offset: 0x0
+    bool disableVRTrackingInAutoplayPS4; //Field offset: 0x1
+};
 
 struct Settings {
-public:
-    uint8_t room[0x10];
-    uint8_t controller[0x24];
-    uint8_t smoothCamera[0x2c];
-    uint8_t audioSettings[0x10];
-    uint8_t misc[0x10];
-    float renderViewportScale;
-    float vrResolutionScale;
-    float menuVRResolutionScaleMultiplier;
-    int antiAliasingLevel;
-    int targetFramerate;
-    int vSyncCount;
-    int maxQueuedFrames;
-    int mainEffect;
-    int bloom;
-    int mirror;
-    int obstacles;
-    bool screenDisplacementEffects;
-    bool smokeGraphics;
-    bool depthTexture;
-    bool burnMarkTrails;
-    int maxShockwaveParticles;
-    int maxNumberOfCutSoundEffects;
+    RoomSettings room;
+    ControllerSettings controller;
+    SmoothCameraSettings smoothCamera;
+    AudioSettings audioSettings;
+    MiscSettings misc;
+    QualitySettings quality;
+    QuestSettings quest;
+    WindowSettings windows;
+    CustomServerSettings customServer;
+    PerformanceToolSettings performanceTools;
+    DebugSettings debug;
 };
-
-
-
-enum ObstacleQuality {
-    Low,
-    Medium,
-    High
-};
-
-
 
 
 DEFINE_IL2CPP_ARG_TYPE(Settings, "BeatSaber.Settings", "Settings");
-DEFINE_IL2CPP_ARG_TYPE(ObstacleQuality, "BeatSaber.Settings", "QualitySettings/ObstacleQuality");
+struct GameObject : Il2CppObject {};
+struct String : StringW {};
+struct BoolSO : Il2CppObject {};
+struct Renderer : Il2CppObject {};
+struct Material : Il2CppObject {};
+struct SystemBool {
+    bool m_value;
+};
 
-/*MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(SettingsApplicatorSO_ApplyGraphicSettings, "", "SettingsApplicatorSO", "ApplyGraphicSettings", void, Il2CppObject* self, Settings settings, int other) {
-    settings.mainEffect = 1;
-    settings.bloom = 1;
-    settings.obstacles = 2;
-    settings.smokeGraphics = true;
-    settings.screenDisplacementEffects = true;
-    settings.maxShockwaveParticles = 1;
-    settings.burnMarkTrails = true;
-    settings.depthTexture = true;
-    settings.mirror = 3;
-    Logger.info("Trying out to apply settigns!");
+struct Behaviour : Il2CppObject{};
+struct MonoBehaviour : Behaviour{};
+struct ImageEffectController : MonoBehaviour{};
+struct MainEffectContainerSO : Il2CppObject{};
+struct MainEffectSO : Il2CppObject{};
+struct PyramidBloomMainEffectSO : MainEffectSO{};
+struct MainEffectCore{};
+
+DEFINE_IL2CPP_ARG_TYPE(GameObject*, "UnityEngine", "GameObject");
+DEFINE_IL2CPP_ARG_TYPE(String*, "System", "String");
+DEFINE_IL2CPP_ARG_TYPE(BoolSO*, "", "BoolSO");
+DEFINE_IL2CPP_ARG_TYPE(SystemBool, "System", "Boolean");
+DEFINE_IL2CPP_ARG_TYPE(Renderer*, "UnityEngine", "Renderer");
+DEFINE_IL2CPP_ARG_TYPE(Material*, "UnityEngine", "Material");
+DEFINE_IL2CPP_ARG_TYPE(ImageEffectController*, "", "ImageEffectController");
+DEFINE_IL2CPP_ARG_TYPE(MainEffectContainerSO*, "", "MainEffectContainerSO");
+DEFINE_IL2CPP_ARG_TYPE(MainEffectSO*, "", "MainEffectSO");
+DEFINE_IL2CPP_ARG_TYPE(MainEffectCore*, "", "MainEffectCore");
+DEFINE_IL2CPP_ARG_TYPE(PyramidBloomMainEffectSO*, "", "PyramidBloomMainEffectSO");
+DEFINE_IL2CPP_ARG_TYPE(MonoBehaviour*, "UnityEngine", "MonoBehaviour");
+DEFINE_IL2CPP_ARG_TYPE(Behaviour*, "UnityEngine", "Behaviour");
+
+MAKE_HOOK_FIND_CLASS_UNSAFE_STATIC(MainEffectCore_SetGlobalShaderValues, "", "MainEffectCore", "SetGlobalShaderValues", void, float baseColorBoost, float baseColorBoostThreshold) {
+    baseColorBoost = 0.10f;
+    baseColorBoostThreshold = 0.01f;
+    MainEffectCore_SetGlobalShaderValues(baseColorBoost, baseColorBoostThreshold);
+}
+
+
+MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(MainEffectController_OnPreRender, "", "MainEffectController", "OnPreRender", void, Il2CppObject* self) {
+    auto imageEffectController = *il2cpp_utils::GetFieldValue<ImageEffectController*>(self, "_imageEffectController");
+    auto _mainEffectContainer = *il2cpp_utils::GetFieldValue<MainEffectContainerSO*>(self, "_mainEffectContainer");
+    auto mainEffect = *il2cpp_utils::GetFieldValue<MainEffectSO*>(_mainEffectContainer, "_mainEffect");
+    il2cpp_utils::RunMethod<void>(mainEffect, "PreRender");
+    il2cpp_utils::SetPropertyValue(imageEffectController, "enabled", true);
+    auto value = SystemBool{true};
+    il2cpp_utils::RunMethod<void>(reinterpret_cast<MainEffectCore*>(il2cpp_utils::GetClassFromName("", "MainEffectCore")), "UpdateKeyword", value);
+}
+
+MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(SettingsApplicatorSO_ApplyGraphicSettings, "", "SettingsApplicatorSO", "ApplyGraphicSettings", void, Il2CppObject* self, Settings settings, int other) {
+    settings.quality.mainEffect = QualitySettings::Game_;
+    settings.quality.bloom = QualitySettings::Game;
+    settings.quality.obstacles = QualitySettings::High_;
+    settings.quality.smokeGraphics = true;
+    settings.quality.screenDisplacementEffects = true;
+    settings.quality.maxShockwaveParticles = 2;
+    settings.quality.burnMarkTrails = true;
+    settings.quality.depthTexture = true;
+    settings.quality.mirror = QualitySettings::High;
+    settings.quality.antiAliasingLevel = 0;
     SettingsApplicatorSO_ApplyGraphicSettings(self, settings, other);
-}*/
+}
 
 MAKE_HOOK_FIND_CLASS_UNSAFE_STATIC(SettingValidations_AdjustQuest3, "BeatSaber.Settings", "SettingValidations", "AdjustQuest3", void, Settings* settings) {
-    SettingValidations_AdjustQuest3(settings);
-    settings->mainEffect = 1;
-    settings->bloom = 1;
-    settings->obstacles = 2;
-    settings->smokeGraphics = true;
-    settings->screenDisplacementEffects = true;
-    settings->maxShockwaveParticles = 1;
-    settings->burnMarkTrails = true;
-    settings->depthTexture = true;
-    settings->mirror = 3;
-    Logger.info("Trying out to apply settigns!");
+    //SettingValidations_AdjustQuest3(settings);
+    settings->quality.mainEffect = QualitySettings::Game_;
+    settings->quality.bloom = QualitySettings::Game;
+    settings->quality.obstacles = QualitySettings::High_;
+    settings->quality.smokeGraphics = true;
+    settings->quality.screenDisplacementEffects = true;
+    settings->quality.maxShockwaveParticles = 2;
+    settings->quality.burnMarkTrails = true;
+    settings->quality.depthTexture = true;
+    settings->quality.mirror = QualitySettings::High;
+    settings->quality.antiAliasingLevel = 0;
 }
 
 MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GraphicSettingsConditionalActivator_GetGraphicsActivatorType, "", "GraphicSettingsConditionalActivator", "Start", bool, Il2CppObject* self) {
-    Logger.info("Graphics Settings Conditional!");
+    Logger.info("GraphicsSettingsConditional Start");
+    auto gameObject = *il2cpp_utils::RunMethod<GameObject*>(self, "get_gameObject").as_optional_result().value_or(nullptr);
+    auto name = *il2cpp_utils::GetPropertyValue<String*>(gameObject, "name").as_optional_result().value_or(nullptr);
+    auto name2 = il2cpp_utils::detail::to_string(static_cast<StringW>(name));
+    Logger.info("GraphicsSettingsConditional END: {}", name2);
+
     return true;
 }
 
-/*MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GamePause_Pause, "", "GamePause", "Pause", void, Il2CppObject* self) {
-    Logger.info("Calling paused!");
-    GamePause_Pause(self);
-    Logger.info("Has paused");
-    Logger.info("Try getting Il2cppObject*");
-    auto saberManager = il2cpp_utils::GetFieldValue<Il2CppObject*>(self, "_saberManager").value();
-    Logger.info("Got object: {}", (void*)(saberManager));
-    Logger.info("Try getting Bool");
-    auto isPaused = il2cpp_utils::GetFieldValue<bool>(self, "_pause").value();
-    Logger.info("Paused value: {}", isPaused);
-}*/
+MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(ObstacleController_InitGraphics, "", "ObstacleController", "InitGraphics", void, Il2CppObject* self, Settings settings) {
+    settings.quality.screenDisplacementEffects = true;
+    ObstacleController_InitGraphics(self, settings);
+}
 
 MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(ConditionalMaterialSwitcher_Awake, "", "ConditionalMaterialSwitcher", "Awake", void, Il2CppObject* self) {
-    Logger.info("ConditionalMaterialSwitcher!!");
-    auto renderer = il2cpp_utils::GetFieldValue<Il2CppObject*>(self, "_renderer").value();
-    auto material1 = il2cpp_utils::GetFieldValue<Il2CppObject*>(self, "_material1").value();
-    il2cpp_utils::RunMethod(renderer, "set_sharedMaterial", material1);
+    auto gameObject = *il2cpp_utils::RunMethod<GameObject*>(self, "get_gameObject").as_optional_result().value_or(nullptr);
+
+    if (gameObject == nullptr) {
+        Logger.info("Nullptr found!");
+        ConditionalMaterialSwitcher_Awake(self);
+        return;
+    }
+
+    auto name = *il2cpp_utils::GetPropertyValue<String*>(gameObject, "name").as_optional_result().value_or(nullptr);
+
+    if (name == nullptr) {
+        Logger.info("no name string found!");
+        ConditionalMaterialSwitcher_Awake(self);
+        return;
+    }
+
+    auto valueBool = *il2cpp_utils::GetFieldValue<BoolSO*>(self, "_value").value_or(nullptr);
+    auto value = *il2cpp_utils::GetPropertyValue<SystemBool, false>(valueBool, "value").as_optional_result().value_or(nullptr);
+
+    auto name2 = il2cpp_utils::detail::to_string(static_cast<StringW>(name));
+
+    if (name2 == "NoteCube" || name2 == "NoteArrow" || name2 == "SaberGlowingEdges" || name2 == "ObstacleFrame" || name2 == "SaberTrailRendererHologram(Clone)")  {
+        value.m_value = true;
+        il2cpp_utils::SetPropertyValue<false>(valueBool, "value", value);
+    }
+
+    ConditionalMaterialSwitcher_Awake(self);
 }
 
 MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(ConditionalActivation_Awake, "", "ConditionalActivation", "Awake", void, Il2CppObject* self) {
-    Logger.info("ConditionalActivation!!");
-    il2cpp_utils::SetFieldValue(self, "_activateOnFalse", true);
+    auto gameObject = *il2cpp_utils::GetPropertyValue<GameObject*>(self, "gameObject").as_optional_result().value_or(nullptr);
+    auto name = *il2cpp_utils::GetPropertyValue<String*>(gameObject, "name").as_optional_result().value_or(nullptr);
+    auto valueBool = *il2cpp_utils::GetFieldValue<BoolSO*>(self, "_value").value_or(nullptr);
+    auto value = *il2cpp_utils::GetPropertyValue<SystemBool>(valueBool, "value").as_optional_result().value_or(nullptr);
+    auto name2 = il2cpp_utils::detail::to_string(static_cast<StringW>(name));
+
+    if ( name2 == "ObstacleFrame")  {
+        value.m_value = true;
+        il2cpp_utils::SetPropertyValue(valueBool, "value", value);
+    }
+
     ConditionalActivation_Awake(self);
 }
-
-
 /// @brief Called at the early stages of game loading
 /// @param info The mod info.  Update this with your mod's info.
 /// @return
@@ -134,4 +346,8 @@ MOD_EXPORT_FUNC void late_load() {
     INSTALL_HOOK(Logger, SettingValidations_AdjustQuest3);
     INSTALL_HOOK(Logger, ConditionalMaterialSwitcher_Awake);
     INSTALL_HOOK(Logger, ConditionalActivation_Awake);
+    INSTALL_HOOK(Logger, SettingsApplicatorSO_ApplyGraphicSettings);
+    INSTALL_HOOK(Logger, ObstacleController_InitGraphics);
+    INSTALL_HOOK(Logger, MainEffectController_OnPreRender);
+    INSTALL_HOOK(Logger, MainEffectCore_SetGlobalShaderValues);
 }
