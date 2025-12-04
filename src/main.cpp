@@ -204,6 +204,69 @@ struct MainEffectSO : Il2CppObject{};
 struct PyramidBloomMainEffectSO : MainEffectSO{};
 struct MainEffectCore{};
 
+struct AllocationRootWithSalt
+{
+    unsigned m_Salt;
+    unsigned m_RootReferenceIndex;
+};
+
+enum MemLabelIdentifier
+{
+};
+
+struct MemLabelId
+{
+    AllocationRootWithSalt m_RootReferenceWithSalt;
+    MemLabelIdentifier identifier;
+};
+
+namespace core
+{
+    template<class T>
+    class StringStorageDefault
+    {
+        enum
+        {
+            kInternalBufferCapacity = 0xF,
+        };
+    protected:
+        T* m_data;
+
+        union
+        {
+            size_t m_capacity;
+            T m_internal[(kInternalBufferCapacity + 1) / sizeof(T)];
+        };
+
+        size_t m_size;
+        MemLabelId m_label;
+    };
+};
+
+namespace core
+{
+    template<class T, class TStorage = StringStorageDefault<T>>
+    class basic_string : TStorage
+    {
+    public:
+        basic_string() = default;
+
+     T const* c_str() const {
+         if (this->m_size > this->m_capacity) {
+            return this->m_data;
+         }
+
+         return static_cast<T const*>(this->m_internal);
+     }
+
+     size_t length() const;
+        basic_string& operator=(const T* copyStr);
+        static basic_string create_from_external(const T* referenceStr, const MemLabelId& label);
+        static basic_string create_from_external(const T* referenceStr, size_t referenceStrLen, const MemLabelId& label);
+    };
+};
+
+
 DEFINE_IL2CPP_ARG_TYPE(GameObject*, "UnityEngine", "GameObject");
 DEFINE_IL2CPP_ARG_TYPE(String*, "System", "String");
 DEFINE_IL2CPP_ARG_TYPE(BoolSO*, "", "BoolSO");
@@ -219,8 +282,8 @@ DEFINE_IL2CPP_ARG_TYPE(MonoBehaviour*, "UnityEngine", "MonoBehaviour");
 DEFINE_IL2CPP_ARG_TYPE(Behaviour*, "UnityEngine", "Behaviour");
 
 MAKE_HOOK_FIND_CLASS_UNSAFE_STATIC(MainEffectCore_SetGlobalShaderValues, "", "MainEffectCore", "SetGlobalShaderValues", void, float baseColorBoost, float baseColorBoostThreshold) {
-    baseColorBoost = 0.10f;
-    baseColorBoostThreshold = 0.01f;
+    baseColorBoost = 0.15f;
+    baseColorBoostThreshold = 0.0f;
     MainEffectCore_SetGlobalShaderValues(baseColorBoost, baseColorBoostThreshold);
 }
 
@@ -322,6 +385,20 @@ MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(ConditionalActivation_Awake, "", "Condition
 
     ConditionalActivation_Awake(self);
 }
+
+MAKE_HOOK(hGlslGpuProgramGLES_CompileProgramImpl, nullptr, void,
+    unsigned int& unknown,
+    core::basic_string<char,core::StringStorageDefault<char>> const& shaderName,
+    core::basic_string<char, core::StringStorageDefault<char>> const& vertex,
+    core::basic_string<char, core::StringStorageDefault<char>> const& fragment,
+    core::basic_string<char, core::StringStorageDefault<char>> const& geometry,
+    core::basic_string<char, core::StringStorageDefault<char>> const& hull,
+    core::basic_string<char, core::StringStorageDefault<char>> const& domain,
+    int& shader, int a, int * b, int *c, int* d) {
+    Logger.info("hGlslGpuProgramGLES_CompileProgramImpl: {}", shaderName.c_str());
+    hGlslGpuProgramGLES_CompileProgramImpl(unknown, shaderName, vertex, fragment, geometry, hull, domain, shader, a, b, c, d);
+}
+
 /// @brief Called at the early stages of game loading
 /// @param info The mod info.  Update this with your mod's info.
 /// @return
@@ -336,6 +413,16 @@ MOD_EXPORT_FUNC void setup(CModInfo& info) {
 /// @return
 MOD_EXPORT_FUNC void load() {
     // Initialize il2cpp functions
+    Logger.info("libunity.so start: {}", modloader_unity_handle);
+    if(modloader_unity_handle) {
+        auto jniOnUnload = dlsym(modloader_unity_handle, "JNI_OnUnload");
+        Logger.info("libunity.so yes: {}", (void*)jniOnUnload);
+        auto GlslGpuProgramGLES_CompileProgramImpl =  (char*)jniOnUnload + 0x6E8EE0;
+        Logger.info("GlslGpuProgramGLES_CompileProgramImpl {}", (void*)GlslGpuProgramGLES_CompileProgramImpl);
+        if(GlslGpuProgramGLES_CompileProgramImpl)
+            INSTALL_HOOK_DIRECT(Logger, hGlslGpuProgramGLES_CompileProgramImpl, reinterpret_cast<void*>(GlslGpuProgramGLES_CompileProgramImpl));
+    }
+
     il2cpp_functions::Init();
 }
 
@@ -344,10 +431,10 @@ MOD_EXPORT_FUNC void load() {
 MOD_EXPORT_FUNC void late_load() {
     INSTALL_HOOK(Logger, GraphicSettingsConditionalActivator_GetGraphicsActivatorType);
     INSTALL_HOOK(Logger, SettingValidations_AdjustQuest3);
-    INSTALL_HOOK(Logger, ConditionalMaterialSwitcher_Awake);
-    INSTALL_HOOK(Logger, ConditionalActivation_Awake);
+    //INSTALL_HOOK(Logger, ConditionalMaterialSwitcher_Awake);
+    //INSTALL_HOOK(Logger, ConditionalActivation_Awake);
     INSTALL_HOOK(Logger, SettingsApplicatorSO_ApplyGraphicSettings);
     INSTALL_HOOK(Logger, ObstacleController_InitGraphics);
-    INSTALL_HOOK(Logger, MainEffectController_OnPreRender);
+    //INSTALL_HOOK(Logger, MainEffectController_OnPreRender);
     INSTALL_HOOK(Logger, MainEffectCore_SetGlobalShaderValues);
 }
