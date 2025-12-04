@@ -212,16 +212,16 @@ struct AllocationRootWithSalt
 
 
 struct StackAllocated {
-    char m_internal[31];
+    char data[31];
     char flags;
 };
 
 struct HeapAllocated {
-    char* data; // 0x0
+    const char* data; // 0x0
     __int64_t capacity; // 0x8
     __int64_t size; // 0x10
     char padding[7]; // padding
-    bool flags;
+    char flags; // 31
 };
 
 namespace core
@@ -232,10 +232,10 @@ namespace core
         {
             kInternalBufferCapacity = 0xF,
         };
-    protected:
+    public:
         union
         {
-            StackAllocated stack;
+            StackAllocated embedded;
             HeapAllocated heap;
         };
 
@@ -245,21 +245,22 @@ namespace core
 
 namespace core
 {
-    template<class TStorage = StringStorageDefault>
-    class basic_string : TStorage
+    class basic_string : public StringStorageDefault
     {
     public:
         basic_string() = default;
 
      char const* c_str() const {
-         if (this->heap.flags >= 64) {
-            return this->heap.data;
+         if (this->heap.flags < 0x40) {
+             return this->embedded.data;
          }
 
-         return static_cast<char const*>(this->stack.m_internal);
+         return this->heap.data;
      }
     };
 };
+
+
 
 
 DEFINE_IL2CPP_ARG_TYPE(GameObject*, "UnityEngine", "GameObject");
@@ -383,14 +384,16 @@ MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(ConditionalActivation_Awake, "", "Condition
 
 MAKE_HOOK(hGlslGpuProgramGLES_CompileProgramImpl, nullptr, void,
     unsigned int& unknown,
-    core::basic_string<core::StringStorageDefault> const& shaderName,
-    core::basic_string<core::StringStorageDefault> const& vertex,
-    core::basic_string<core::StringStorageDefault> const& fragment,
-    core::basic_string<core::StringStorageDefault> const& geometry,
-    core::basic_string<core::StringStorageDefault> const& hull,
-    core::basic_string<core::StringStorageDefault> const& domain,
+    core::basic_string const& shaderName,
+    core::basic_string const* vertex,
+    core::basic_string const& fragment,
+    core::basic_string const& geometry,
+    core::basic_string const& hull,
+    core::basic_string const& domain,
     int& shader, int a, int * b, int *c, int* d) {
-    Logger.info("hGlslGpuProgramGLES_CompileProgramImpl: {}", shaderName.c_str());
+    Logger.info("CompileProgramImpl title: {}", shaderName.c_str());
+    Logger.info("CompileProgramImpl fragment: {} - {} - {} - {}", fragment.c_str(), fragment.heap.size, fragment.heap.capacity, (void*)fragment.heap.data);
+    Logger.info("");
     hGlslGpuProgramGLES_CompileProgramImpl(unknown, shaderName, vertex, fragment, geometry, hull, domain, shader, a, b, c, d);
 }
 
