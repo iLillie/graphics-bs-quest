@@ -210,19 +210,22 @@ struct AllocationRootWithSalt
     unsigned m_RootReferenceIndex;
 };
 
-enum MemLabelIdentifier
-{
+
+struct StackAllocated {
+    char m_internal[31];
+    char flags;
 };
 
-struct MemLabelId
-{
-    AllocationRootWithSalt m_RootReferenceWithSalt;
-    MemLabelIdentifier identifier;
+struct HeapAllocated {
+    char* data; // 0x0
+    __int64_t capacity; // 0x8
+    __int64_t size; // 0x10
+    char padding[7]; // padding
+    bool flags;
 };
 
 namespace core
 {
-    template<class T>
     class StringStorageDefault
     {
         enum
@@ -230,39 +233,31 @@ namespace core
             kInternalBufferCapacity = 0xF,
         };
     protected:
-        T* m_data;
-
         union
         {
-            size_t m_capacity;
-            T m_internal[(kInternalBufferCapacity + 1) / sizeof(T)];
+            StackAllocated stack;
+            HeapAllocated heap;
         };
 
-        size_t m_size;
-        MemLabelId m_label;
+        int memLabel;
     };
 };
 
 namespace core
 {
-    template<class T, class TStorage = StringStorageDefault<T>>
+    template<class TStorage = StringStorageDefault>
     class basic_string : TStorage
     {
     public:
         basic_string() = default;
 
-     T const* c_str() const {
-         if (this->m_size > this->m_capacity) {
-            return this->m_data;
+     char const* c_str() const {
+         if (this->heap.flags >= 64) {
+            return this->heap.data;
          }
 
-         return static_cast<T const*>(this->m_internal);
+         return static_cast<char const*>(this->stack.m_internal);
      }
-
-     size_t length() const;
-        basic_string& operator=(const T* copyStr);
-        static basic_string create_from_external(const T* referenceStr, const MemLabelId& label);
-        static basic_string create_from_external(const T* referenceStr, size_t referenceStrLen, const MemLabelId& label);
     };
 };
 
@@ -388,12 +383,12 @@ MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(ConditionalActivation_Awake, "", "Condition
 
 MAKE_HOOK(hGlslGpuProgramGLES_CompileProgramImpl, nullptr, void,
     unsigned int& unknown,
-    core::basic_string<char,core::StringStorageDefault<char>> const& shaderName,
-    core::basic_string<char, core::StringStorageDefault<char>> const& vertex,
-    core::basic_string<char, core::StringStorageDefault<char>> const& fragment,
-    core::basic_string<char, core::StringStorageDefault<char>> const& geometry,
-    core::basic_string<char, core::StringStorageDefault<char>> const& hull,
-    core::basic_string<char, core::StringStorageDefault<char>> const& domain,
+    core::basic_string<core::StringStorageDefault> const& shaderName,
+    core::basic_string<core::StringStorageDefault> const& vertex,
+    core::basic_string<core::StringStorageDefault> const& fragment,
+    core::basic_string<core::StringStorageDefault> const& geometry,
+    core::basic_string<core::StringStorageDefault> const& hull,
+    core::basic_string<core::StringStorageDefault> const& domain,
     int& shader, int a, int * b, int *c, int* d) {
     Logger.info("hGlslGpuProgramGLES_CompileProgramImpl: {}", shaderName.c_str());
     hGlslGpuProgramGLES_CompileProgramImpl(unknown, shaderName, vertex, fragment, geometry, hull, domain, shader, a, b, c, d);
